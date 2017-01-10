@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "70350331302",
+    "firebase_url": "https://vardinmi-3b39c.firebaseio.com",
+    "project_id": "vardinmi-3b39c",
+    "storage_bucket": "vardinmi-3b39c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:70350331302:android:ff419b9ed00c9f58",
+        "android_client_info": {
+          "package_name": "com.example.oguz.vardinmi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "70350331302-0j75q5tolagjh9fvb0a3vu7mnfje6c57.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDebXk38oNhF5QdJTsNmLtCu-9beqj-6tU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
