@@ -1,6 +1,7 @@
 package com.example.oguz.vardinmi;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -35,7 +37,14 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         int position = (Integer) v.getTag(R.id.key_position);
         if (v.getId() == R.id.btnSendNotification){
-            Toast.makeText(getActivity().getApplicationContext(),"Hellooo",Toast.LENGTH_SHORT).show();
+            String data = list_items.get(position).getPhoneNumber();
+            double lat = Double.parseDouble(data.split("/")[1]);
+            double lon = Double.parseDouble(data.split("/")[3]);
+            Intent intentMap = new Intent(getActivity(),MapsActivity.class);
+            intentMap.putExtra("lon",lon);
+            intentMap.putExtra("lat",lat);
+            startActivity(intentMap);
+            Toast.makeText(getActivity().getApplicationContext(),"lon: "+lon+" lat:"+lat,Toast.LENGTH_LONG).show();
         }
     }
     ListView listview_contacts;
@@ -50,6 +59,7 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
         String uid = preferences.getString("uid",null);
 
         if(uid==null) return null;
+
 
         database = FirebaseDatabase.getInstance();
         ref = database.getReference(uid);
@@ -90,11 +100,11 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
                         String value = entry.getValue();
                         if(value.equals("wait"))
                         list_items.add(new PersonInfo(name,entry.getValue(),false,entry.getKey()));
-                        else {
+                        else if(value.startsWith("lat/")){
                             list_items.add(new PersonInfo(name, entry.getValue(), true, entry.getKey()));
                         }
                     }
-                    listviewAdapter = new ListViewAdapter(c,list_items,WaitingFragment.this);
+                    listviewAdapter = new ListViewAdapter(c,list_items,WaitingFragment.this,"Haritada Görüntüle");
                     listview_contacts = (ListView) view.findViewById(R.id.listView_contacts);
                     listview_contacts.setAdapter(listviewAdapter);
                 }

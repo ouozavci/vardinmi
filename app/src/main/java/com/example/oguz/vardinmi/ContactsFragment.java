@@ -210,7 +210,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
         @Override
         protected void onPostExecute(List contactList) {
 
-            listviewAdapter = new ListViewAdapter(getActivity().getApplicationContext(), contactList, ContactsFragment.this);
+            listviewAdapter = new ListViewAdapter(getActivity().getApplicationContext(), contactList, ContactsFragment.this,"Konum iste");
             listview_contacts.setAdapter(listviewAdapter);
 
             if (progressDialog.isShowing()) {

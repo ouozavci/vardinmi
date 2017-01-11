@@ -15,10 +15,12 @@ import java.util.List;
 public class ListViewAdapter extends ArrayAdapter<PersonInfo> {
 
     private OnClickListener clickListener;
+    private String btnText;
 
-    public ListViewAdapter(Context context, List<PersonInfo> items,OnClickListener onClickListener ) {
+    public ListViewAdapter(Context context, List<PersonInfo> items,OnClickListener onClickListener,String btnText) {
         super(context, R.layout.contacts_list_item, items);
         this.clickListener = onClickListener;
+        this.btnText = btnText;
     }
 
 
@@ -56,6 +58,7 @@ public class ListViewAdapter extends ArrayAdapter<PersonInfo> {
         viewHolder.txtNumber.setText(personInfo.getPhoneNumber());
         viewHolder.txtUsing.setText(personInfo.isUsing()?"using loginApp!":"");
         viewHolder.btnSendNotification.setVisibility(personInfo.isUsing()?View.VISIBLE:View.INVISIBLE);
+        viewHolder.btnSendNotification.setText(btnText);
 
 
 

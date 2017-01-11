@@ -74,15 +74,11 @@ public class FromNotification extends AppCompatActivity {
                                 lon = mGPS.getLongtitude();
                                 lat = mGPS.getLatitude();
                             }
-                            Toast.makeText(getApplicationContext(),"lon: "+lon+" lat:"+lat,Toast.LENGTH_LONG).show();
                         }
                         else {
                             Toast.makeText(getApplicationContext(),"Couldn't get GPS",Toast.LENGTH_LONG).show();
                         }
-
-
-
-                        refReq.child(uid).setValue("GPS BABYYY");
+                        refReq.child(uid).setValue("lat/"+lat+"/lon/"+lon);
                         startActivity(new Intent(FromNotification.this,MainActivity.class));
                     }
                 });
@@ -95,10 +91,8 @@ public class FromNotification extends AppCompatActivity {
                     }
                 });
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
 

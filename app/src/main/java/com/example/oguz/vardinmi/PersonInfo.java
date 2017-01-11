@@ -46,36 +46,4 @@ public class PersonInfo implements Comparable<PersonInfo>{
         this.isUsing = isUsing;
         this.uid = uid;
     }
-
-    /**
-     * Created by oguz on 11.01.2017.
-     */
-
-    public static class WaitingFragment extends Fragment implements View.OnClickListener {
-        @Override
-        public void onClick(View v) {
-
-        }
-
-        ListView listview_contacts;
-        public List<PersonInfo> list_items = new ArrayList<PersonInfo>();
-        private ListViewAdapter listviewAdapter;
-        private ProgressDialog progressDialog;
-
-        FirebaseDatabase database;
-        DatabaseReference reference;
-        DatabaseReference referenceMine;
-
-        @Nullable
-        @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            View view = inflater.inflate(R.layout.fragment_contacts,container,false);
-
-            list_items.add(new PersonInfo("oguz baba","0543787874",true,"asdasdasdas"));
-            listviewAdapter = new ListViewAdapter(getActivity().getApplicationContext(),list_items,this);
-
-
-            return view;
-        }
-    }
 }

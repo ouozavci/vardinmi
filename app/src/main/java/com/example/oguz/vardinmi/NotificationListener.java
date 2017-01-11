@@ -40,42 +40,44 @@ public class NotificationListener extends Service {
         String id = sharedPreferences.getString("uid", null);
 
 
+        if(id==null) this.stopSelf();
+        else {
+            database = FirebaseDatabase.getInstance();
+            reference = database.getReference(id);
 
-        database = FirebaseDatabase.getInstance();
-        reference = database.getReference(id);
+            Toast.makeText(getApplicationContext(), "Service started", Toast.LENGTH_SHORT).show();
+            //Adding a valueevent listener to firebase
+            //this will help us to  track the value changes on firebase
+            reference.addValueEventListener(new ValueEventListener() {
 
-        Toast.makeText(getApplicationContext(),"Service started",Toast.LENGTH_SHORT).show();
-        //Adding a valueevent listener to firebase
-        //this will help us to  track the value changes on firebase
-        reference.addValueEventListener(new ValueEventListener() {
-
-            //This method is called whenever we change the value in firebase
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                //Getting the value from firebase
-                //We stored none as a initial value
-                String msg="";
-                try {
-                    msg = snapshot.child("request").getValue().toString();
-                    //So if the value is none we will not create any notification
-                    if (msg.equals("none"))
-                        return;
-                    //If the value is anything other than none that means a notification has arrived
-                    //calling the method to show notification
-                    //String msg is containing the msg that has to be shown with the notification
-                    showNotification(msg);
-                }catch (Exception e){
-                    Log.i("Notification","There is no notification.");
+                //This method is called whenever we change the value in firebase
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    //Getting the value from firebase
+                    //We stored none as a initial value
+                    String msg = "";
+                    try {
+                        msg = snapshot.child("request").getValue().toString();
+                        //So if the value is none we will not create any notification
+                        if (msg.equals("none"))
+                            return;
+                        //If the value is anything other than none that means a notification has arrived
+                        //calling the method to show notification
+                        //String msg is containing the msg that has to be shown with the notification
+                        showNotification(msg);
+                    } catch (Exception e) {
+                        Log.i("Notification", "There is no notification.");
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                Log.e("The read failed: ", firebaseError.getMessage());
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError firebaseError) {
+                    Log.e("The read failed: ", firebaseError.getMessage());
+                }
+            });
+        }
+            return START_STICKY;
 
-        return START_STICKY;
     }
 
 
