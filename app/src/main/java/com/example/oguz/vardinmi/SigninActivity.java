@@ -1,8 +1,10 @@
 package com.example.oguz.vardinmi;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,11 +14,20 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.oguz.vardinmi.jsonlib.JSONParser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SigninActivity extends AppCompatActivity {
 
@@ -37,7 +48,6 @@ public class SigninActivity extends AppCompatActivity {
 
         preferences = getApplicationContext().getSharedPreferences("userPref", Context.MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
-
         //Bounding views with objects
         txtPhone = (EditText) findViewById(R.id.txtPhoneSignin);
         txtPass = (EditText) findViewById(R.id.txtPassSignin);
@@ -77,6 +87,15 @@ public class SigninActivity extends AppCompatActivity {
 
                     Log.d("Firebase", "onAuthStateChanged:signed_in:" + user.getUid());
 
+                        String[] params = {user.getUid().toString() , user.getEmail().toString().split("@")[0]};
+                        String result = "fail";
+                    try {
+                        result = new addUser().execute(params).get();
+                    }
+                    catch (Exception e){
+                        Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
+                    }
+
                     Intent intentMain = new Intent(SigninActivity.this,MainActivity.class);
                     finish();
                     startActivity(intentMain);
@@ -89,7 +108,7 @@ public class SigninActivity extends AppCompatActivity {
         };
     }
 
-    private void createUser(String phone,String pass){
+    private void createUser(final String phone, String pass){
         mAuth.createUserWithEmailAndPassword(phone+"@vardinmi.com", pass)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -106,6 +125,7 @@ public class SigninActivity extends AppCompatActivity {
                         else
                         Toast.makeText(SigninActivity.this, "Success",
                                 Toast.LENGTH_SHORT).show();
+
                     }
                 });
     }
@@ -124,5 +144,63 @@ public class SigninActivity extends AppCompatActivity {
         }
     }
 
+
+    ProgressDialog pDialog;
+    class addUser extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new ProgressDialog(SigninActivity.this);
+            pDialog.setMessage("Connecting...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        protected String doInBackground(String... args) {
+
+            String uid = args[0];
+            String phone = args[1];
+
+            // Building Parameters
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("uid", uid));
+            params.add(new BasicNameValuePair("phone", phone));
+
+
+            JSONParser jsonParser = new JSONParser();
+            // getting JSON Object
+            // Note that create product url accepts POST method
+            JSONObject json = jsonParser.makeHttpRequest("http://pinti.16mb.com/vardinmi/addUser.php",
+                    "POST", params);
+
+            // check log cat fro response
+            try {
+                Log.d("Create Response", json.toString());
+            } catch (NullPointerException e) {
+                Log.e("JSon Null", "Json returned null from POST");
+            }
+            // check for success tag
+            try {
+                int success = json.getInt("success");
+
+                if (success == 1) {
+                    // successfully created product
+                } else {
+                    // failed to create product
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+
+        protected void onPostExecute(String file_url) {
+            // dismiss the dialog once done
+            pDialog.dismiss();
+        }
+
+    }
 
 }

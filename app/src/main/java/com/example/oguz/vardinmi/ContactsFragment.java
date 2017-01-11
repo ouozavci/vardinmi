@@ -21,6 +21,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthProvider;
 import com.google.firebase.auth.ProviderQueryResult;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,6 +44,8 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
     private ProgressDialog progressDialog;
 
     FirebaseAuth mAuth;
+    FirebaseDatabase database;
+    DatabaseReference reference;
 
     @Nullable
     @Override
@@ -52,13 +56,13 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
 
         listview_contacts = (ListView) view.findViewById(R.id.listView_contacts);
         if (list_items.size() == 0) {   // liste dolu ise tekrardan Async Task çağırma
-
             new FetchAsyncTask().execute();
-
         } else {
-
-
         }
+
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference("message");
+
 
         return view;
     }
@@ -66,7 +70,6 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {  // geri tuşuna bastığımızda listview in aynen kalması için gerekli
         super.onActivityCreated(savedInstanceState);
-
         this.listview_contacts = ((ListView) getActivity().findViewById(R.id.listView_contacts));
         this.listview_contacts.setAdapter(this.listviewAdapter);
     }
@@ -81,6 +84,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
 
         int position = (Integer) v.getTag(R.id.key_position);
         if (v.getId() == R.id.btnSendNotification){
+            reference.setValue(position + "--" + list_items.get(position).getPhoneNumber() +" "+list_items.get(position).getName());
 
         }
 
@@ -115,8 +119,6 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
                     //String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
                     if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                         // telefon numarasına sahip ise if içine gir.
-
-
 
                         Cursor person_cursor = contentResolver.query(
                                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -160,7 +162,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
             while (checkAll.size()<contacts.size()){
 
             }
-
+            list_items=providers;
             return providers;
         }
 
