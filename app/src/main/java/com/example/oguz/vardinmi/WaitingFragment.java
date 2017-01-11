@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,7 +33,10 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-
+        int position = (Integer) v.getTag(R.id.key_position);
+        if (v.getId() == R.id.btnSendNotification){
+            Toast.makeText(getActivity().getApplicationContext(),"Hellooo",Toast.LENGTH_SHORT).show();
+        }
     }
     ListView listview_contacts;
     public List<PersonInfo> list_items = new ArrayList<PersonInfo>();
@@ -42,7 +46,7 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_contacts,container,false);
 
-        SharedPreferences preferences = getActivity().getSharedPreferences("userPref", Context.MODE_PRIVATE);
+        final SharedPreferences preferences = getActivity().getSharedPreferences("userPref", Context.MODE_PRIVATE);
         String uid = preferences.getString("uid",null);
 
         if(uid==null) return null;
@@ -51,13 +55,45 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
         ref = database.getReference(uid);
 
         final Context c = getActivity().getApplicationContext();
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        /*    ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Map<String,String> td = (HashMap<String,String>) dataSnapshot.getValue();
+                    td.remove("request");
+
                   for(Map.Entry<String,String> entry:td.entrySet()){
-                      list_items.add(new PersonInfo(entry.getKey(),entry.getValue(),true,entry.getKey()));
+                      String name = preferences.getString(entry.getKey(),"Bilinmeyen");
+                      list_items.add(new PersonInfo(name,entry.getValue(),false,entry.getKey()));
                   }
+                    listviewAdapter = new ListViewAdapter(c,list_items,WaitingFragment.this);
+                    listview_contacts = (ListView) view.findViewById(R.id.listView_contacts);
+                    listview_contacts.setAdapter(listviewAdapter);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });*/
+
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    list_items=new ArrayList<PersonInfo>();
+
+                    Map<String,String> td = (HashMap<String,String>) dataSnapshot.getValue();
+                    td.remove("request");
+
+                    for(Map.Entry<String,String> entry:td.entrySet()){
+                        String name = preferences.getString(entry.getKey(),"Bilinmeyen");
+                        String value = entry.getValue();
+                        if(value.equals("wait"))
+                        list_items.add(new PersonInfo(name,entry.getValue(),false,entry.getKey()));
+                        else {
+                            list_items.add(new PersonInfo(name, entry.getValue(), true, entry.getKey()));
+                        }
+                    }
                     listviewAdapter = new ListViewAdapter(c,list_items,WaitingFragment.this);
                     listview_contacts = (ListView) view.findViewById(R.id.listView_contacts);
                     listview_contacts.setAdapter(listviewAdapter);
@@ -69,7 +105,7 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
                 }
             });
 
-
         return view;
     }
+
 }

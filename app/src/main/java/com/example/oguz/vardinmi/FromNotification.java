@@ -3,6 +3,12 @@ package com.example.oguz.vardinmi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +30,8 @@ public class FromNotification extends AppCompatActivity {
     TextView tvInfo;
     Button btnAccept;
     Button btnDecline;
+
+    GPSTracker mGPS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,24 @@ public class FromNotification extends AppCompatActivity {
                 btnAccept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        mGPS = new GPSTracker(getApplicationContext());
+
+                        double lon = 0;
+                        double lat = 0;
+                        if(mGPS.canGetLocation){
+                            while(lon==0.0||lat==0.0) {
+                                mGPS.getLocation();
+                                lon = mGPS.getLongtitude();
+                                lat = mGPS.getLatitude();
+                            }
+                            Toast.makeText(getApplicationContext(),"lon: "+lon+" lat:"+lat,Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(),"Couldn't get GPS",Toast.LENGTH_LONG).show();
+                        }
+
+
+
                         refReq.child(uid).setValue("GPS BABYYY");
                         startActivity(new Intent(FromNotification.this,MainActivity.class));
                     }
