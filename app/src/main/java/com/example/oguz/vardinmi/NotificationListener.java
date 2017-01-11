@@ -89,11 +89,14 @@ public class NotificationListener extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         builder.setContentIntent(pendingIntent);
         builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher));
-        builder.setContentTitle("Birileri seni merak ediyor :)");
-        if(sharedPreferences.contains(msg))
+
+        if(sharedPreferences.contains(msg)){
         builder.setContentText(sharedPreferences.getString(msg,"")+" senin konum bilgine ulaşmak istiyor.");
-        else
+            builder.setContentTitle(sharedPreferences.getString(msg,"")+" seni merak ediyor :)");
+        }
+        else{
         builder.setContentText("Birileri senin konum bilgine ulaşmak istiyor.");
+            builder.setContentTitle("Birileri seni merak ediyor :)");}
         builder.setAutoCancel(true);
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         builder.setSound(alarmSound);

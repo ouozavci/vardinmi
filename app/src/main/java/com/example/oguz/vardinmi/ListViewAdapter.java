@@ -40,7 +40,7 @@ public class ListViewAdapter extends ArrayAdapter<PersonInfo> {
             viewHolder = new ViewHolder();
             viewHolder.txtName = (TextView)view.findViewById(R.id.txtName);
             viewHolder.txtNumber = (TextView)view.findViewById(R.id.txtNumber);
-            viewHolder.txtUsing = (TextView)view.findViewById(R.id.txtUsing);
+           // viewHolder.txtUsing = (TextView)view.findViewById(R.id.txtUsing);
             viewHolder.btnSendNotification = (Button)view.findViewById(R.id.btnSendNotification);
             view.setTag(viewHolder);
 
@@ -56,7 +56,7 @@ public class ListViewAdapter extends ArrayAdapter<PersonInfo> {
 
         viewHolder.txtName.setText(personInfo.getName());
         viewHolder.txtNumber.setText(personInfo.getPhoneNumber());
-        viewHolder.txtUsing.setText(personInfo.isUsing()?"using loginApp!":"");
+        // viewHolder.txtUsing.setText(personInfo.isUsing()?"using loginApp!":"");
         viewHolder.btnSendNotification.setVisibility(personInfo.isUsing()?View.VISIBLE:View.INVISIBLE);
         viewHolder.btnSendNotification.setText(btnText);
 

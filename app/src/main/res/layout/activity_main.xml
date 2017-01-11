@@ -26,12 +26,13 @@
                 android:weightSum="1">
 
                 <TextView
-                    android:text="İzlediklerim"
+                    android:text="Hoşgeldiniz"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView"
                     android:textSize="24sp"
-                    android:textStyle="normal|bold" />
+                    android:textStyle="normal|bold"
+                    android:textAlignment="center" />
 
                 <Button
                     android:text="CEVAPLAR"
@@ -40,10 +41,19 @@
                     android:id="@+id/btnWait" />
 
                 <Button
-                    android:text="Takip ekle"
+                    android:text="İstek Yolla"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/btnContacts" />
+
+                <TextView
+                    android:text="İstek yolla butonu ile rehberinde uygulamamızı kullanan kişilere nerde olduklarını sorabilir ve Cevaplar tuşu ile verecekleri cevapları takip edebilirsin."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/textView2"
+                    android:layout_weight="0.41"
+                    android:textSize="16sp"
+                    android:textAlignment="center" />
 
             </LinearLayout>
 

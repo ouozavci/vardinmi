@@ -68,26 +68,30 @@ public class FromNotification extends AppCompatActivity {
 
                         double lon = 0;
                         double lat = 0;
-                        if(mGPS.canGetLocation){
+
+                        if(mGPS.canGetLocation && mGPS.isGPSEnabled){
                             while(lon==0.0||lat==0.0) {
                                 mGPS.getLocation();
                                 lon = mGPS.getLongtitude();
                                 lat = mGPS.getLatitude();
+                                refReq.child(uid).setValue("lat/"+lat+"/lon/"+lon);
+                                ref.child("request").setValue("none");
+                                startActivity(new Intent(FromNotification.this,MainActivity.class));
+                                finish();
                             }
                         }
                         else {
                             Toast.makeText(getApplicationContext(),"Couldn't get GPS",Toast.LENGTH_LONG).show();
                         }
-                        refReq.child(uid).setValue("lat/"+lat+"/lon/"+lon);
-                        startActivity(new Intent(FromNotification.this,MainActivity.class));
                     }
                 });
 
                 btnDecline.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        refReq.child(uid).setValue("NOOOOOOOO");
+                        refReq.child(uid).setValue("declined");
                         startActivity(new Intent(FromNotification.this,MainActivity.class));
+                        finish();
                     }
                 });
             }
@@ -97,9 +101,5 @@ public class FromNotification extends AppCompatActivity {
         });
 
 
-
-
-
-        ref.child("request").setValue("none");
     }
 }

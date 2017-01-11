@@ -99,7 +99,10 @@ public class WaitingFragment extends Fragment implements View.OnClickListener {
                         String name = preferences.getString(entry.getKey(),"Bilinmeyen");
                         String value = entry.getValue();
                         if(value.equals("wait"))
-                        list_items.add(new PersonInfo(name,entry.getValue(),false,entry.getKey()));
+                        list_items.add(new PersonInfo(name,"Konum bilgisi bekleniyor",false,entry.getKey()));
+                        else if(value.equals("declined")){
+                        list_items.add(new PersonInfo(name,"İstek reddedildi",false,entry.getKey()));
+                        }
                         else if(value.startsWith("lat/")){
                             list_items.add(new PersonInfo(name, entry.getValue(), true, entry.getKey()));
                         }
