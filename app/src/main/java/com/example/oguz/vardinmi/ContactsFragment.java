@@ -54,6 +54,7 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
     FirebaseAuth mAuth;
     FirebaseDatabase database;
     DatabaseReference reference;
+    DatabaseReference referenceMine;
 
     @Nullable
     @Override
@@ -95,8 +96,12 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
             String reqUid = list_items.get(position).getUid();
 
             reference = database.getReference(reqUid).child("request");
+
+
             if(myUid == null) return;
             reference.setValue(myUid);
+            referenceMine = database.getReference(myUid).child(reqUid);
+            referenceMine.setValue("wait");
             Toast.makeText(getActivity().getApplication().getApplicationContext(),list_items.get(position).getUid(),Toast.LENGTH_LONG).show();
         }
 

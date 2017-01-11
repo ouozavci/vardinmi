@@ -1,5 +1,7 @@
 package com.example.oguz.vardinmi;
 
+import android.app.ActivityManager;
+import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
         uid = userPref.getString("uid", "ERROR!");
 
+        if(!isMyServiceRunning(NotificationListener.class)){
+            startService(new Intent(MainActivity.this, NotificationListener.class));
+        }
 
         btnContacts.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +67,15 @@ public class MainActivity extends AppCompatActivity {
                         getPermissionToReadUserContacts();
                     }
                 }
+                else{
+                        try {
+                            ContactsFragment fr = new ContactsFragment();
+                            MainActivity.this.getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.fragment_container, fr).addToBackStack("fragment").commit();
+                        } catch (Exception e) {
+                            Snackbar.make(v, "Error!", Snackbar.LENGTH_SHORT).show();
+                        }
+                }
             }
         });
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +90,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(getIntent());
             }
         });
+
+        Button btnWait = (Button) findViewById(R.id.btnWait);
+        btnWait.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WaitingFragment fr = new WaitingFragment();
+                MainActivity.this.getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container,fr).addToBackStack("fragment").commit();
+            }
+        });
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void getPermissionToReadUserContacts() {

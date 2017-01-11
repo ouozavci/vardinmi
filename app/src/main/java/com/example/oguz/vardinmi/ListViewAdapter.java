@@ -17,12 +17,8 @@ public class ListViewAdapter extends ArrayAdapter<PersonInfo> {
     private OnClickListener clickListener;
 
     public ListViewAdapter(Context context, List<PersonInfo> items,OnClickListener onClickListener ) {
-
-
         super(context, R.layout.contacts_list_item, items);
-
         this.clickListener = onClickListener;
-
     }
 
 
@@ -79,8 +75,6 @@ public class ListViewAdapter extends ArrayAdapter<PersonInfo> {
         TextView txtName;
         TextView txtNumber;
         TextView txtUsing;
-        ImageButton imgCall;
-        ImageButton imgMsg;
         Button btnSendNotification;
     }
 }

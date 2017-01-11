@@ -22,7 +22,8 @@
             <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:weightSum="1">
 
                 <TextView
                     android:text="İzlediklerim"
@@ -32,13 +33,11 @@
                     android:textSize="24sp"
                     android:textStyle="normal|bold" />
 
-                <ListView
+                <Button
+                    android:text="Beklediklerim"
                     android:layout_width="match_parent"
-                    android:layout_height="209dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/textView"
-                    android:layout_above="@+id/btnLogout" />
+                    android:layout_height="wrap_content"
+                    android:id="@+id/btnWait" />
 
                 <Button
                     android:text="Takip ekle"
