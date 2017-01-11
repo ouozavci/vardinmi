@@ -2,6 +2,8 @@ package com.example.oguz.vardinmi;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.oguz.vardinmi.jsonlib.Constants;
 import com.example.oguz.vardinmi.jsonlib.JSONParser;
@@ -29,6 +32,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -65,8 +69,6 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
         }
 
         database = FirebaseDatabase.getInstance();
-        reference = database.getReference("message");
-
 
         return view;
     }
@@ -85,11 +87,17 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-
         int position = (Integer) v.getTag(R.id.key_position);
-        if (v.getId() == R.id.btnSendNotification){
-            reference.setValue(position + "--" + list_items.get(position).getPhoneNumber() +" "+list_items.get(position).getName());
 
+        if (v.getId() == R.id.btnSendNotification){
+            SharedPreferences pref = getActivity().getSharedPreferences("userPref", Context.MODE_PRIVATE);
+            String myUid = pref.getString("uid",null);
+            String reqUid = list_items.get(position).getUid();
+
+            reference = database.getReference(reqUid).child("request");
+            if(myUid == null) return;
+            reference.setValue(myUid);
+            Toast.makeText(getActivity().getApplication().getApplicationContext(),list_items.get(position).getUid(),Toast.LENGTH_LONG).show();
         }
 
     }
@@ -160,9 +168,10 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
             List<NameValuePair> args = new ArrayList<>();
             args.add(new BasicNameValuePair("query", checkPhoneQuery));
             ArrayList<String> usingNumbers = new ArrayList<>();
+            JSONObject obj = null;
             try {
                 JSONParser jsonParser = new JSONParser();
-                JSONObject obj = jsonParser.makeHttpRequest("http://pinti.16mb.com/vardinmi/checkPhones.php",
+                obj = jsonParser.makeHttpRequest("http://pinti.16mb.com/vardinmi/checkPhones.php",
                         "POST",
                         args);
                 JSONArray jsnNumbers = obj.getJSONArray("phones");
@@ -176,11 +185,18 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
             } catch (Exception e) {
                 Log.e("Error", e.getMessage());
             }
+            SharedPreferences pref = getActivity().getSharedPreferences("userPref",Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
             for (int i = 0; i < contacts.size(); i++) {
                 if(usingNumbers.contains(contacts.get(i).split("/")[1]))
-                    list_items.add(new PersonInfo(contacts.get(i).split("/")[0], contacts.get(i).split("/")[1], true));
+                    try {
+                        editor.putString(obj.getString(contacts.get(i).split("/")[1]),contacts.get(i).split("/")[0]);
+                        list_items.add(new PersonInfo(contacts.get(i).split("/")[0], contacts.get(i).split("/")[1], true,obj.getString(contacts.get(i).split("/")[1])));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
             }
-
+            editor.commit();
 
             Collections.sort(list_items);
             return list_items;

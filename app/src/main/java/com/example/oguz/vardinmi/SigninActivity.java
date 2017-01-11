@@ -95,7 +95,7 @@ public class SigninActivity extends AppCompatActivity {
                     catch (Exception e){
                         Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_LONG).show();
                     }
-
+                    startService(new Intent(SigninActivity.this, NotificationListener.class));
                     Intent intentMain = new Intent(SigninActivity.this,MainActivity.class);
                     finish();
                     startActivity(intentMain);

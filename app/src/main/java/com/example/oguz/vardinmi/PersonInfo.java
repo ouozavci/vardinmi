@@ -6,6 +6,7 @@ public class PersonInfo implements Comparable<PersonInfo>{
     private String name;
     private String phoneNumber;
     private boolean isUsing;
+    private String uid;
 
     public String getName(){
         return this.name;
@@ -21,9 +22,13 @@ public class PersonInfo implements Comparable<PersonInfo>{
     public String getPhoneNumber(){
         return this.phoneNumber;
     }
-    public PersonInfo(String name, String phoneNumber,boolean isUsing){
+    public String getUid(){
+        return this.uid;
+    }
+    public PersonInfo(String name, String phoneNumber,boolean isUsing,String uid){
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.isUsing = isUsing;
+        this.uid = uid;
     }
 }

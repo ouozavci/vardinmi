@@ -95,7 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                     editor.commit();
 
                     Log.d("Firebase", "onAuthStateChanged:signed_in:" + user.getUid());
-
+                    startService(new Intent(LoginActivity.this, NotificationListener.class));
                     Intent intentMain = new Intent(LoginActivity.this,MainActivity.class);
                     finish();
                     startActivity(intentMain);
