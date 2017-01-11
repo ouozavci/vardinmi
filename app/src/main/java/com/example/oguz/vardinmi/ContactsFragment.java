@@ -16,6 +16,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.example.oguz.vardinmi.jsonlib.Constants;
+import com.example.oguz.vardinmi.jsonlib.JSONParser;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,6 +26,8 @@ import com.google.firebase.auth.ProviderQueryResult;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -105,21 +109,21 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
 
         @Override
         protected List<PersonInfo> doInBackground(Void... params) {
+
             ContentResolver contentResolver = getActivity().getContentResolver();
             Cursor cursor = contentResolver.query(ContactsContract.Contacts.CONTENT_URI, null,
                     null, null, null);
             List<String> contacts = new ArrayList<>();
             List<String> numbers = new ArrayList<>();
+            String checkPhoneQuery = "select * from vardinmi where phone='qwerty'";
             if (cursor.getCount() > 0) {
 
                 while (cursor.moveToNext()) {
 
                     String id = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID)); // id ye göre eşleşme yapılacak
-                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                    //String phone = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)); // telefonda kayıtlı olan ismi
                     if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
                         // telefon numarasına sahip ise if içine gir.
-
                         Cursor person_cursor = contentResolver.query(
                                 ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                                 null,
@@ -127,45 +131,60 @@ public class ContactsFragment extends Fragment implements View.OnClickListener{
                                 new String[]{id}, null);
 
                         while (person_cursor.moveToNext()) {
-
                             String person_phoneNumber = person_cursor.getString(person_cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll(" ", "");
                             if (person_phoneNumber.startsWith("+9"))
                                 person_phoneNumber = person_phoneNumber.substring(2);
                             if (!contacts.contains(name + "/" + person_phoneNumber)) {
                                 contacts.add(name + "/" + person_phoneNumber);
                                 numbers.add(person_phoneNumber);
-                                                            }
+                                checkPhoneQuery += " OR phone='" + person_phoneNumber + "'";
+                            }
                         }
-                        person_cursor.close();
 
+                    /*    while (person_cursor.moveToNext()) {
+                            String person_phoneNumber = person_cursor.getString(person_cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)).replaceAll(" ", "");
+                            if (!contacts.contains(name + "/" + person_phoneNumber)) {
+                                list_items.add(new PersonInfo(name, person_phoneNumber, false)); // ismini ve telefon numarasını list içine at
+                                contacts.add(name + "/" + person_phoneNumber);
+                                numbers.add(person_phoneNumber);
+                                checkPhoneQuery += " OR phoneNumber='" + person_phoneNumber + "'";
+                            }
+                        }*/
+                        person_cursor.close();
                     }
+
                 }
             }
-            final List<PersonInfo> providers = new ArrayList<>();
-            final List<String> checkAll = new ArrayList<>();
+
+            Log.i("phoneQuery", checkPhoneQuery);
+            List<NameValuePair> args = new ArrayList<>();
+            args.add(new BasicNameValuePair("query", checkPhoneQuery));
+            ArrayList<String> usingNumbers = new ArrayList<>();
+            try {
+                JSONParser jsonParser = new JSONParser();
+                JSONObject obj = jsonParser.makeHttpRequest("http://pinti.16mb.com/vardinmi/checkPhones.php",
+                        "POST",
+                        args);
+                JSONArray jsnNumbers = obj.getJSONArray("phones");
+
+                for (int i = 0; i < jsnNumbers.length(); i++) {
+                    usingNumbers.add(jsnNumbers.getString(i));
+                }
+
+                if (obj != null) Log.i("phoneResult", obj.toString());
+                else Log.i("phoneResult", "null");
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+            }
             for (int i = 0; i < contacts.size(); i++) {
-                final String phone = contacts.get(i).split("/")[1];
-                final String name = contacts.get(i).split("/")[0];
-                mAuth.fetchProvidersForEmail(phone+"@vardinmi.com").addOnCompleteListener(new OnCompleteListener<ProviderQueryResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<ProviderQueryResult> task) {
-                        checkAll.add("");
-                        if(task.isSuccessful()){
-                            if(task.getResult().getProviders().size()>0)
-                                providers.add(new PersonInfo(name,phone,true));
-                            }
-                    }
-                });
-
+                if(usingNumbers.contains(contacts.get(i).split("/")[1]))
+                    list_items.add(new PersonInfo(contacts.get(i).split("/")[0], contacts.get(i).split("/")[1], true));
             }
 
-            while (checkAll.size()<contacts.size()){
 
-            }
-            list_items=providers;
-            return providers;
+            Collections.sort(list_items);
+            return list_items;
         }
-
 
         @Override
         protected void onPostExecute(List contactList) {
